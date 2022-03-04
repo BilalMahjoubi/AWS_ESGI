@@ -71,6 +71,20 @@ def get_rds(engine):
     matiere = session.query(table).all()
     return matiere
 
+def purge_rds(engine):
+    metadata = MetaData()
+    metadata.bind = engine
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    table = Table(
+        'matiere',
+        metadata,
+        autoload=True,
+        autoload_with=engine
+    )
+    session.query(table).delete()
+    session.commit()
+    
 st.title('Projet AWS')
 
 if st.button('Charger dans RDS'):
@@ -95,6 +109,14 @@ if st.button('Transfere S3 vers RDS'):
     st.text(data_rds)
 
 if st.button('Get RDS'):
+    conn_db = connect_db()
+    data_rds = get_rds(conn_db)
+    st.text(data_rds)
+    
+if st.button('Vider RDS'):
+    conn_db = connect_db()
+    data_rds = purge_rds(conn_db)
+    st.text(data_rds)
     conn_db = connect_db()
     data_rds = get_rds(conn_db)
     st.text(data_rds)
